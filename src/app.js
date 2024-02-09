@@ -8,15 +8,19 @@ import ProductManager from "./controllers/ProductManager.js";
 import http from "http";
 import { Server } from "socket.io";
 import viewsRouter from './router/views.routes.js';
+import mongoose from "mongoose";
+import prodRouter from "./router/products.js";
 
 const product = new ProductManager();
+
+mongoose.connect("mongodb://localhost:27017/ecommerce");
 
 const app = express();
 const httpServer = http.createServer(app)
 const io = new Server(httpServer)
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 app.engine("handlebars", engine())
 app.set("view engine", "handlebars")
@@ -38,9 +42,10 @@ io.on('connection', (socket) => {
     })
 })
 
-app.use("/api/products", ProductRouter)
-app.use("/api/cart", CartRouter)
+app.use("/api/products", prodRouter)
+// app.use("/api/products", ProductRouter)
+// app.use("/api/cart", CartRouter)
 
 httpServer.listen(8080, () => {
     console.log(`Server Connection`);
-  });
+});
